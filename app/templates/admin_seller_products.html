@@ -1,135 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Seller Products</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Products – Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f7f8fa; color: #1a1a1a; min-height: 100vh; }
+
+        .page-header {
+            background: #fff; border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px; display: flex; align-items: center; gap: 16px;
+        }
+        .page-header h2 { font-size: 20px; font-weight: 700; }
+        .back-link {
+            color: #ff6600; text-decoration: none; font-size: 14px; font-weight: 500;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .content { padding: 28px 32px; }
+
+        .table-wrapper { overflow-x: auto; }
+
+        table {
+            width: 100%; border-collapse: collapse;
+            background: #fff; border-radius: 12px; overflow: hidden;
+            border: 1px solid #e5e7eb; font-size: 13px;
+        }
+        thead tr { background: #1f2937; }
+        th {
+            padding: 12px 14px; text-align: left;
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.4px; color: #fff;
+        }
+        td {
+            padding: 11px 14px; color: #374151;
+            border-bottom: 1px solid #f3f4f6; vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+
+        .action-link {
+            color: #2563eb; text-decoration: none; font-weight: 500;
+            font-size: 12px; margin-right: 8px;
+        }
+        .action-link:hover { text-decoration: underline; }
+
+        .btn-danger {
+            padding: 4px 10px; background: #fee2e2; color: #991b1b;
+            border: none; border-radius: 6px; font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-danger:hover { background: #fecaca; }
+
+        .inline-form { display: inline; }
+
+        .status-active { color: #065f46; font-weight: 600; }
+        .status-hide { color: #92400e; font-weight: 600; }
+    </style>
 </head>
 <body>
 
-<h2>Seller Products</h2>
+    <div class="page-header">
+        <a href="{{ url_for('admin.dashboard') }}" class="back-link">← Back to Dashboard</a>
+        <h2>Seller Products</h2>
+    </div>
 
-<a href="{{ url_for('admin.dashboard') }}">← Back to Dashboard</a>
+    <div class="content">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Category</th>
+                        <th>Gender</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr data-product-id="{{ product.id }}">
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.product_name }}</td>
+                        <td>₹{{ product.product_price }}</td>
+                        <td>{{ product.product_stock }}</td>
+                        <td>{{ product.product_category }}</td>
+                        <td>{{ product.product_gender }}</td>
+                        <td>
+                            <span class="{{ 'status-active' if product.status == 'active' else 'status-hide' }}">
+                                {{ product.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('product.update', product_id=product.id) }}" class="action-link">Edit</a>
+                            <form action="{{ url_for('product.delete', product_id=product.id) }}"
+                                method="POST" class="inline-form"
+                                onsubmit="return confirm('Delete this product?');">
+                                <button type="submit" class="btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<table border="1" cellpadding="10">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Product Name</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Category</th>
-            <th>Gender</th>
-            <th>status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const socket = io();
+            const tableBody = document.querySelector("table tbody");
 
-    <tbody>
-        {% for product in products %}
-        <tr data-product-id="{{ product.id }}">
-            <td>{{ product.id }}</td>
-            <td>{{ product.product_name }}</td>
-            <td>{{ product.product_price }}</td>
-            <td>{{ product.product_stock }}</td>
-            <td>{{ product.product_category }}</td>
-            <td>{{ product.product_gender }}</td>
-            <td>{{ product.status }}</td>
+            function buildRow(product) {
+                const statusClass = product.status === 'active' ? 'status-active' : 'status-hide';
+                return `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>₹${product.price}</td>
+                    <td>${product.stock}</td>
+                    <td>${product.category}</td>
+                    <td>${product.gender}</td>
+                    <td><span class="${statusClass}">${product.status}</span></td>
+                    <td>
+                        <a href="/product/update/${product.id}" class="action-link">Edit</a>
+                        <form action="/product/delete/${product.id}" method="POST" class="inline-form" onsubmit="return confirm('Delete?');">
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                    </td>`;
+            }
 
-            <td>
-                <!-- Update Button -->
-                <a href="{{ url_for('product.update', product_id=product.id) }}">
-                    <button type="button">Update</button>
-                </a>
+            socket.on("product_added", function (product) {
+                const tr = document.createElement("tr");
+                tr.setAttribute("data-product-id", product.id);
+                tr.innerHTML = buildRow(product);
+                tableBody.append(tr);
+            });
 
-                <!-- Delete Button -->
-                <form action="{{ url_for('product.delete', product_id=product.id) }}"
-                      method="POST"
-                      style="display:inline;"
-                      onsubmit="return confirm('Are you sure you want to delete this product?');">
-                    <button type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            socket.on("product_updated", function (product) {
+                const tr = document.querySelector(`tr[data-product-id="${product.id}"]`);
+                if (!tr) return;
+                tr.innerHTML = buildRow(product);
+            });
+
+            socket.on("product_deleted", function (data) {
+                const tr = document.querySelector(`tr[data-product-id="${data.id}"]`);
+                if (tr) tr.remove();
+            });
+        });
+    </script>
 
 </body>
-
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const socket = io();
-
-    const tableBody = document.querySelector("table tbody");
-
-    // ---------- PRODUCT ADDED ----------
-    socket.on("product_added", function(product) {
-        console.log("Product added:", product);
-
-        // Create new table row
-        const tr = document.createElement("tr");
-        tr.setAttribute("data-product-id", product.id);
-
-        tr.innerHTML = `
-            <td>${product.id}</td>
-            <td>${product.name}</td>
-            <td>${product.price}</td>
-            <td>${product.stock}</td>
-            <td>${product.category}</td>
-            <td>${product.gender}</td>
-            <td>${product.status}</td>
-            <td>
-                <a href="/product/update/${product.id}">
-                    <button type="button">Update</button>
-                </a>
-                <form action="/product/delete/${product.id}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                    <button type="submit">Delete</button>
-                </form>
-            </td>
-        `;
-
-        tableBody.append(tr); // add to top
-    });
-
-    // ---------- PRODUCT UPDATED ----------
-    socket.on("product_updated", function(product) {
-        console.log("Product updated:", product);
-
-        const tr = document.querySelector(`tr[data-product-id="${product.id}"]`);
-        if (!tr) {
-            console.warn("Product row not found:", product.id);
-            return;
-        }
-
-        // Update the row cells
-        tr.innerHTML = `
-            <td>${product.id}</td>
-            <td>${product.name}</td>
-            <td>${product.price}</td>
-            <td>${product.stock}</td>
-            <td>${product.category}</td>
-            <td>${product.gender}</td>
-            <td>${product.status}</td>
-            <td>
-                <a href="/product/update/${product.id}">
-                    <button type="button">Update</button>
-                </a>
-                <form action="/product/delete/${product.id}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                    <button type="submit">Delete</button>
-                </form>
-            </td>
-        `;
-    });
-
-    // ---------- PRODUCT DELETED ----------
-    socket.on("product_deleted", function(data) {
-        console.log("Product deleted:", data.id);
-        const tr = document.querySelector(`tr[data-product-id="${data.id}"]`);
-        if (tr) tr.remove();
-    });
-});
-</script>
-
 </html>

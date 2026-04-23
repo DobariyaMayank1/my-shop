@@ -3,45 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>login</title>
+    <title>Login – My Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f2f5;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .auth-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-card h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .auth-card .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 28px;
+        }
+
+        .flash-messages p {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1a1a1a;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #ff6600;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #ff6600;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 6px;
+        }
+
+        .btn-primary:hover { background: #e05500; }
+
+        .auth-links {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .auth-links a {
+            color: #ff6600;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-links a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
+    <div class="auth-card">
+        <h2>Welcome back</h2>
+        <p class="subtitle">Sign in to your My Shop account</p>
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <h2>User Login</h2>
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
 
-    <form  method="post">
-        {{  form.hidden_tag()  }}
+        <form method="post">
+            {{ form.hidden_tag() }}
 
-        {{  form.username.label  }} <br>
-        {{  form.username  }} <br> <br>
+            <div class="form-group">
+                {{ form.username.label }}
+                {{ form.username(placeholder="Enter your username") }}
+            </div>
 
-        {{  form.password.label  }} <br>
-        {{  form.password  }} <br> <br>
+            <div class="form-group">
+                {{ form.password.label }}
+                {{ form.password(placeholder="Enter your password") }}
+            </div>
 
-        {{ form.submit}} <br>
-    </form>
+            {{ form.submit(class="btn-primary") }}
+        </form>
 
-    <br>
-    <a href="/forgotpassword">forgot password</a>
-
-
-
-    <br>
-    <br>
-    <div>
-        <h3>doesn't have username  :--- <a href="/register">register first</a></h3>
-
-    </div>
-    
-    <div>
-        <h3><a href="/">continue without login</a></h3>
+        <div class="auth-links">
+            <span><a href="/forgotpassword">Forgot password?</a></span>
+            <span>Don't have an account? <a href="/register">Register here</a></span>
+            <span><a href="/">Continue without login</a></span>
+        </div>
     </div>
 </body>
 </html>

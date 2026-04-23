@@ -1,47 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product listing</title>
+    <title>Add Product – My Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh; background: #f7f8fa;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; align-items: flex-start; justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .form-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 36px; width: 100%; max-width: 560px;
+        }
+
+        .form-card h2 {
+            font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 28px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
+            display: block; font-size: 13px; font-weight: 600;
+            color: #444; margin-bottom: 6px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="file"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%; padding: 10px 14px;
+            border: 1px solid #ddd; border-radius: 8px;
+            font-size: 14px; color: #1a1a1a; background: #fff;
+            outline: none; transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus { border-color: #ff6600; }
+
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .seller-id-display {
+            padding: 10px 14px; background: #f3f4f6;
+            border: 1px solid #e5e7eb; border-radius: 8px;
+            font-size: 14px; color: #6b7280;
+        }
+
+        .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+
+        .btn-submit {
+            flex: 1; padding: 12px; background: #ff6600; color: #fff;
+            border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #e05500; }
+
+        .btn-cancel {
+            padding: 12px 20px; background: #f3f4f6; color: #374151;
+            border-radius: 8px; font-size: 15px; font-weight: 600;
+            text-decoration: none; text-align: center;
+            transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #e5e7eb; }
+    </style>
 </head>
-
 <body>
-    <h2>add product </h2>
+    <div class="form-card">
+        <h2>Add New Product</h2>
 
-    <form method="post" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
+        <form method="post" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
 
-        {{ form.product_name.label }} <br>
-        {{ form.product_name }} <br> <br>
+            <div class="form-group">
+                {{ form.product_name.label }}
+                {{ form.product_name(placeholder="Product name") }}
+            </div>
 
-        {{ form.product_price.label }} <br>
-        {{ form.product_price }} <br> <br>
+            <div class="form-group">
+                {{ form.product_price.label }}
+                {{ form.product_price(placeholder="Price in ₹") }}
+            </div>
 
-        {{ form.product_image.label }} <br>
-        {{ form.product_image }} <br> <br>
+            <div class="form-group">
+                {{ form.product_image.label }}
+                {{ form.product_image() }}
+            </div>
 
-        {{ form.product_details.label }} <br>
-        {{ form.product_details }} <br> <br>
+            <div class="form-group">
+                {{ form.product_details.label }}
+                {{ form.product_details(placeholder="Describe the product...") }}
+            </div>
 
-        {{ form.product_category.label }} <br>
-        {{ form.product_category }} <br> <br>
+            <div class="form-group">
+                {{ form.product_category.label }}
+                {{ form.product_category() }}
+            </div>
 
-        {{ form.product_gender.label }} <br>
-        {{ form.product_gender }} <br> <br>
+            <div class="form-group">
+                {{ form.product_gender.label }}
+                {{ form.product_gender() }}
+            </div>
 
-        {{ form.product_stock.label }} <br>
-        {{ form.product_stock }} <br> <br>
+            <div class="form-group">
+                {{ form.product_stock.label }}
+                {{ form.product_stock(placeholder="Available stock") }}
+            </div>
 
-        {{ form.product_seller_id.label }} <br>
-        {{ form.product_seller_id.data }} <br> <br>
+            <div class="form-group">
+                {{ form.product_seller_id.label }}
+                <div class="seller-id-display">{{ form.product_seller_id.data }}</div>
+            </div>
 
-        {{ form.submit}}
-
-        <a href="{{ url_for('product.cancel')}}">cancel</a>
-
-    </form>
+            <div class="form-actions">
+                {{ form.submit(class="btn-submit") }}
+                <a href="{{ url_for('product.cancel') }}" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
 </body>
-
 </html>

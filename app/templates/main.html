@@ -1,87 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>guest page</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <title>My Shop</title>
+    <style>
+        /* ── Reset ── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        body { font-family: 'Segoe UI', sans-serif; background: #f7f8fa; color: #1a1a1a; }
+
+        /* ── Header ── */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 28px; height: 64px;
+            background: #fff; border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .logo { font-size: 22px; font-weight: 800; color: #ff6600; letter-spacing: -0.5px; }
+
+        .searchbar { flex: 1; display: flex; justify-content: center; padding: 0 24px; }
+
+        .searchbar input {
+            width: 100%; max-width: 480px;
+            padding: 9px 16px; border: 1px solid #ddd; border-radius: 24px;
+            font-size: 14px; outline: none; background: #f7f8fa;
+            cursor: not-allowed; color: #aaa;
+        }
+
+        .header-right { display: flex; align-items: center; gap: 20px; }
+
+        .header-right a {
+            text-decoration: none; color: #aaa; font-size: 14px; font-weight: 500;
+            pointer-events: none;
+        }
+
+        /* ── Layout ── */
+        .layout { display: flex; height: calc(100vh - 64px); }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 220px; flex-shrink: 0;
+            background: #fff; border-right: 1px solid #e5e7eb;
+            display: flex; flex-direction: column;
+            padding: 16px 12px;
+        }
+
+        .sidebar .top { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+
+        .sidebar .nav-item {
+            padding: 10px 14px; border-radius: 8px;
+            font-size: 14px; font-weight: 500; color: #aaa;
+            cursor: not-allowed;
+        }
+
+        .sidebar .login-btn {
+            margin-top: 12px; padding: 10px 14px;
+            background: #ff6600; color: #fff;
+            border-radius: 8px; font-size: 14px; font-weight: 600;
+            text-align: center; cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sidebar .login-btn:hover { background: #e05500; }
+
+        /* ── Main ── */
+        .main { flex: 1; padding: 28px; overflow-y: auto; }
+
+        .guest-banner {
+            background: linear-gradient(135deg, #fff4ee, #fff);
+            border: 1px solid #ffd4b3;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .guest-banner p { font-size: 15px; color: #555; }
+
+        .guest-banner a {
+            padding: 9px 20px; background: #ff6600; color: #fff;
+            border-radius: 8px; font-size: 14px; font-weight: 600;
+            text-decoration: none; white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .guest-banner a:hover { background: #e05500; }
+
+        /* ── Products Grid ── */
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        /* ── Product Card ── */
+        .product-card {
+            background: #fff; border: 1px solid #e5e7eb;
+            border-radius: 12px; overflow: hidden;
+            display: flex; flex-direction: column;
+            opacity: 0.85;
+        }
+
+        .product-card img { width: 100%; height: 220px; object-fit: cover; }
+
+        .product-card .card-body { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+
+        .product-card .card-body p { font-size: 13px; color: #555; line-height: 1.4; }
+
+        .product-card .card-body p strong { color: #1a1a1a; }
+
+        .buybutton { padding: 14px; }
+
+        .buybutton a {
+            display: block; text-align: center;
+            padding: 9px 0; background: #ccc; color: #fff;
+            border-radius: 8px; font-size: 14px; font-weight: 600;
+            text-decoration: none; cursor: not-allowed;
+        }
+    </style>
+</head>
 <body id="body">
 
     <!-- HEADER -->
     <div class="header">
         <div class="logo">My Shop</div>
-
-        <div class="searchbar" id="searchbar">
-            <input type="text" placeholder="Search products..." />
+        <div class="searchbar">
+            <input type="text" placeholder="Search products..." disabled>
         </div>
-
-        <div class="right">
-            <div class="favorite"><a >Favorite</a></div>
-            <div class="profile"><a >Profile</a></div>
+        <div class="header-right">
+            <a>❤ Favorite</a>
+            <a>👤 Profile</a>
         </div>
     </div>
 
     <div class="layout">
-
         <div class="sidebar">
-
             <div class="top">
-                <div class="home" id="sidebar-home">Home</div>
-                <div class="favorite" id="sidebar-favorite">Favorite</div>
-                <div class="profile" id="sidebar-profile">Profile</div>
-
-                <div class="filter" id="sidebar-filter">Filter</div>
-
+                <div class="nav-item">🏠 Home</div>
+                <div class="nav-item">❤ Favorite</div>
+                <div class="nav-item">👤 Profile</div>
+                <div class="nav-item">🔍 Filter</div>
             </div>
-        <div class="logout" id="sidebar-logout">login</div>
-
+            <div class="login-btn">Login to Shop</div>
         </div>
 
         <!-- MAIN -->
         <div class="main">
+            <div class="guest-banner">
+                <p>👋 Browse our products — <strong>login to buy, like, and more.</strong></p>
+                <a href="/login">Sign in</a>
+            </div>
+
             {% if products %}
             <div class="products">
                 {% for product in products %}
                 <div class="product-card">
-
-                    <img src="{{ url_for('static', filename='uploads/' + product.product_image) }}">
-
-                    <p><strong>Name:</strong> {{ product.product_name }}</p>
-                    <p><strong>Price:</strong> ₹{{ product.product_price }}</p>
-                    <p><strong>Details:</strong> {{ product.product_details }}</p>
-                    <p><strong>Category:</strong> {{ product.product_category }}</p>
-                    <p><strong>Gender:</strong> {{ product.product_gender }}</p>
-                    <p><strong>Stock:</strong> {{ product.product_stock }}</p>
-                    <p><strong>Seller ID:</strong> {{ product.seller_id }}</p>
-                    <p><strong>Product ID:</strong> {{ product.id }}</p>
-                    <input type="checkbox" class="like-checkbox" data-product-id="{{ product.id }}" 
-                    {% if product.id in liked_products %}
-                        checked 
-                    {% endif %}>
-
-                    <div class="buybutton">
-                        <a >buy</a>
+                    <img src="{{ url_for('static', filename='uploads/' + product.product_image) }}" alt="{{ product.product_name }}">
+                    <div class="card-body">
+                        <p><strong>{{ product.product_name }}</strong></p>
+                        <p>₹{{ product.product_price }}</p>
+                        <p>{{ product.product_details }}</p>
+                        <p>{{ product.product_category }} · {{ product.product_gender }}</p>
+                        <p>Stock: {{ product.product_stock }}</p>
                     </div>
-
+                    <div class="buybutton">
+                        <a>Buy Now</a>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
             {% endif %}
-
-
         </div>
     </div>
 
-
     <script>
-        const body = document.getElementById('body')
-        body.addEventListener('click',function(){
-            window.location.href='/login';
-        })
-
+        document.getElementById('body').addEventListener('click', function () {
+            window.location.href = '/login';
+        });
     </script>
 
 </body>

@@ -1,407 +1,368 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home page</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <title>Admin Dashboard – My Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f7f8fa; color: #1a1a1a; }
 
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 28px; height: 64px;
+            background: #fff; border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .logo { font-size: 22px; font-weight: 800; color: #ff6600; letter-spacing: -0.5px; }
+        .searchbar { flex: 1; display: flex; justify-content: center; padding: 0 24px; }
+        .searchbar input {
+            width: 100%; max-width: 480px; padding: 9px 16px;
+            border: 1px solid #ddd; border-radius: 24px; font-size: 14px;
+            outline: none; background: #f7f8fa; cursor: pointer;
+        }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .header-right a { text-decoration: none; color: #444; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+        .header-right a:hover { color: #ff6600; }
+
+        .layout { display: flex; height: calc(100vh - 64px); }
+
+        .sidebar {
+            width: 220px; flex-shrink: 0;
+            background: #fff; border-right: 1px solid #e5e7eb;
+            display: flex; flex-direction: column; padding: 16px 12px;
+        }
+        .sidebar .top { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar .nav-item {
+            padding: 10px 14px; border-radius: 8px;
+            font-size: 14px; font-weight: 500; color: #444;
+            cursor: pointer; transition: background 0.15s, color 0.15s;
+        }
+        .sidebar .nav-item:hover { background: #fff4ee; color: #ff6600; }
+        .sidebar .nav-item.active { background: #fff4ee; color: #ff6600; }
+        .sidebar .logout-btn {
+            margin-top: 12px; padding: 10px 14px;
+            background: #ff4d4d; color: #fff; border-radius: 8px;
+            font-size: 14px; font-weight: 600; text-align: center; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sidebar .logout-btn:hover { background: #e03c3c; }
+
+        .main { flex: 1; padding: 28px; overflow-y: auto; }
+
+        .flash-messages p {
+            background: #fff3cd; border: 1px solid #ffc107; color: #856404;
+            padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 14px;
+        }
+
+        /* ── Section ── */
+        .section { margin-bottom: 40px; }
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+
+        /* ── Table ── */
+        .table-wrapper { overflow-x: auto; }
+
+        table {
+            width: 100%; border-collapse: collapse;
+            background: #fff; border-radius: 12px; overflow: hidden;
+            border: 1px solid #e5e7eb; font-size: 13px;
+        }
+        thead tr { background: #1f2937; }
+        th {
+            padding: 12px 14px; text-align: left;
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.4px; color: #fff;
+        }
+        td {
+            padding: 11px 14px; color: #374151;
+            border-bottom: 1px solid #f3f4f6; vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+
+        /* ── Action Links & Buttons ── */
+        .action-link {
+            color: #2563eb; text-decoration: none; font-weight: 500;
+            font-size: 12px; margin-right: 8px;
+        }
+        .action-link:hover { text-decoration: underline; }
+
+        .btn-danger {
+            padding: 4px 10px; background: #fee2e2; color: #991b1b;
+            border: none; border-radius: 6px; font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-danger:hover { background: #fecaca; }
+
+        .inline-form { display: inline; }
+
+        .status-active { color: #065f46; font-weight: 600; }
+        .status-block { color: #991b1b; font-weight: 600; }
+        .status-hide { color: #92400e; font-weight: 600; }
+
+        .empty-msg { color: #888; font-size: 14px; padding: 16px 0; }
+    </style>
+</head>
 <body>
 
-    <!-- HEADER -->
     <div class="header">
         <div class="logo">My Shop</div>
-
         <div class="searchbar" id="searchbar">
-            <input type="text" placeholder="Search products..." />
+            <input type="text" placeholder="Search products..." readonly>
         </div>
-
-        <div class="right">
-            <div class="favorite"><a href="/favorite">Favorite</a></div>
-            <div class="logout"><a href="/logout">Logout</a></div>
-            <div class="profile"><a href="/profile">Profile</a></div>
+        <div class="header-right">
+            <a href="/favorite">❤ Favorite</a>
+            <a href="/profile">👤 Profile</a>
+            <a href="/logout">Logout</a>
         </div>
     </div>
 
-    <!-- LAYOUT -->
     <div class="layout">
-
-        <!-- SIDEBAR -->
         <div class="sidebar">
-
             <div class="top">
-                <div class="home" id="sidebar-home">Home</div>
-                <!-- <div class="home" ><button onsubmit="return ">Home</button></div> -->
-                <div class="favorite" id="sidebar-favorite">Favorite</div>
-                <div class="profile" id="sidebar-profile">Profile</div>
-                {% if user.user_type == 's' %}
-                <div class="my_product" id="sidebar-myproduct">My Product</div>
-                {% endif %}
-                {% if user.user_type == 'admin' %}
-                <div class="admin" id="sidebar-dashboard">admin dashboard</div>
-                {% endif %}
-                <div class="filter" id="sidebar-filter">Filter</div>
-
-                <div class="filter-dropdown" id="filter-dropdown">
-                    <h4>Category</h4>
-                    <label><input type="checkbox" value="shirt"> Shirt</label><br>
-                    <label><input type="checkbox" value="pant"> Pant</label><br>
-                    <label><input type="checkbox" value="shoes"> Shoes</label>
-
-                    <h4>Gender</h4>
-                    <label><input type="checkbox" value="men"> Men</label><br>
-                    <label><input type="checkbox" value="women"> Women</label><br>
-                    <label><input type="checkbox" value="kids"> Kid</label>
-
-                    <h4>Price</h4>
-                    <input type="range" min="0" max="5000" step="100" id="priceRange">
-                    <p>Max Price: ₹<span id="priceValue">5000</span></p>
-
-                    <button id="apply-filter">Apply Filter</button>
-
-                </div>
-
+                <div class="nav-item" id="sidebar-home">🏠 Home</div>
+                <div class="nav-item" id="sidebar-favorite">❤ Favorite</div>
+                <div class="nav-item" id="sidebar-profile">👤 Profile</div>
+                <div class="nav-item active" id="sidebar-dashboard">⚙ Admin Dashboard</div>
+                <div class="nav-item" id="sidebar-filter">🔍 Filter</div>
             </div>
-            <div class="logout" id="sidebar-logout">Logout</div>
+            <div class="logout-btn" id="sidebar-logout">Logout</div>
         </div>
 
-        <!-- MAIN -->
         <div class="main">
 
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            {% for message in messages %}
-            <p>{{ message }}</p>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-
-            {% if users %}
-            <div class="user-table">
-                <table border="1" cellpadding="10" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>User Type</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Password</th>
-                            <th>status</th>
-                            <th>Seller Products</th>
-                            <th>Bought Products</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-
-
-                    <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td>{{ user.id }}</td>
-                            <td>{{ user.user_type }}</td>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.password }}</td>
-                            <td>{{ user.status }}</td>
-
-                            <!-- SELLER PRODUCTS (only for sellers) -->
-                            <td>
-                                {% if user.user_type == 's' %}
-                                <a href="{{ url_for('admin.seller_products', seller_id=user.id) }}">
-                                    View Seller Products
-                                </a>
-                                {% else %}
-                                —
-                                {% endif %}
-                            </td>
-
-                            <!-- BOUGHT PRODUCTS (for all users) -->
-                            <td>
-                                <a href="{{ url_for('admin.buyer_products', buyer_id=user.id) }}">
-                                    View Bought Products
-                                </a>
-                            </td>
-
-                            <!-- ACTIONS -->
-                            <td>
-                                <!-- UPDATE USER -->
-                                <a href="{{ url_for('admin.update_user', user_id=user.id) }}">
-                                    Edit
-                                </a>
-
-                                <!-- DELETE USER -->
-                                <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}"
-                                    style="display:inline;"
-                                    onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                    <button type="submit">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
                         {% endfor %}
-                    </tbody>
-
-
-                </table>
+                    {% endif %}
+                {% endwith %}
             </div>
-            {% else %}
-            <p>No users found.</p>
-            {% endif %}
 
+            <!-- USERS -->
+            <div class="section">
+                <div class="section-title">👥 Users</div>
+                {% if users %}
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Type</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Seller Products</th>
+                                <th>Bought Products</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.user_type }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="{{ 'status-active' if user.status == 'active' else 'status-block' }}">
+                                        {{ user.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if user.user_type == 's' %}
+                                    <a href="{{ url_for('admin.seller_products', seller_id=user.id) }}" class="action-link">View Products</a>
+                                    {% else %}—{% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin.buyer_products', buyer_id=user.id) }}" class="action-link">View Orders</a>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin.update_user', user_id=user.id) }}" class="action-link">Edit</a>
+                                    <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}"
+                                        class="inline-form"
+                                        onsubmit="return confirm('Delete this user?');">
+                                        <button type="submit" class="btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-msg">No users found.</p>
+                {% endif %}
+            </div>
 
-            <h2>All Products</h2>
+            <!-- PRODUCTS -->
+            <div class="section">
+                <div class="section-title">📦 All Products</div>
+                {% if products %}
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                                <th>Gender</th>
+                                <th>Stock</th>
+                                <th>Seller ID</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-body">
+                            {% for product in products %}
+                            <tr id="product-{{ product.id }}">
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.product_name }}</td>
+                                <td>₹{{ product.product_price }}</td>
+                                <td>{{ product.product_category }}</td>
+                                <td>{{ product.product_gender }}</td>
+                                <td>{{ product.product_stock }}</td>
+                                <td>{{ product.seller_id }}</td>
+                                <td>
+                                    <span class="{{ 'status-active' if product.status == 'active' else 'status-hide' }}">
+                                        {{ product.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('product.update', product_id=product.id) }}" class="action-link">Edit</a>
+                                    <form method="POST" action="{{ url_for('product.delete', product_id=product.id) }}"
+                                        class="inline-form" onsubmit="return confirm('Delete this product?');">
+                                        <button type="submit" class="btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-msg">No products found.</p>
+                {% endif %}
+            </div>
 
-            {% if products %}
-            <table border="1" cellpadding="10" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Category</th>
-                        <th>Gender</th>
-                        <th>Stock</th>
-                        <th>Seller ID</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="products-body">
-                    {% for product in products %}
-                    <tr id="product-{{ product.id }}">
-                        <td>{{ product.id }}</td>
-                        <td>{{ product.product_name }}</td>
-                        <td>₹{{ product.product_price }}</td>
-                        <td>{{ product.product_category }}</td>
-                        <td>{{ product.product_gender }}</td>
-                        <td>{{ product.product_stock }}</td>
-                        <td>{{ product.seller_id }}</td>
-                        <td>{{ product.status }}</td>
-                        <td>
-                            <a href="{{ url_for('product.update', product_id=product.id) }}">
-                                Edit
-                            </a>
-                            <form method="POST" action="{{ url_for('product.delete', product_id=product.id) }}"
-                                style="display:inline;" onsubmit="return confirm('Delete this product?');">
-                                <button type="submit">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p>No products found.</p>
-            {% endif %}
-
-            <h2>All Orders</h2>
-
-            {% if orders %}
-            <table border="1" cellpadding="10" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Buyer ID</th>
-                        <th>Product ID</th>
-                        <th>Quantity</th>
-                        <th>Total Amount</th>
-                        <!-- <th>Status</th>
-                        <th>Order Date</th> -->
-                    </tr>
-                </thead>
-
-                <tbody id="orders-table-body">
-                    {% for order in orders %}
-                    <tr>
-                        <td>{{ order.id }}</td>
-                        <td>{{ order.user_id }}</td>
-                        <td>{{ order.product_id }}</td>
-                        <td>{{ order.quantity }}</td>
-                        <td>₹{{ order.purchase_price }}</td>
-                        <!-- <td>{{ order.status }}</td>
-                        <td>{{ order.created_at }}</td> -->
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p>No orders found.</p>
-            {% endif %}
+            <!-- ORDERS -->
+            <div class="section">
+                <div class="section-title">🛍 All Orders</div>
+                {% if orders %}
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Buyer ID</th>
+                                <th>Product ID</th>
+                                <th>Quantity</th>
+                                <th>Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body">
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.user_id }}</td>
+                                <td>{{ order.product_id }}</td>
+                                <td>{{ order.quantity }}</td>
+                                <td>₹{{ order.purchase_price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-msg">No orders found.</p>
+                {% endif %}
+            </div>
 
         </div>
     </div>
 
-
     <script>
-        const homebtn = document.getElementById('sidebar-home')
-        homebtn.addEventListener('click', () => {
-            window.location.href = '/home';
+        document.getElementById('sidebar-home').addEventListener('click', () => window.location.href = '/home');
+        document.getElementById('sidebar-favorite').addEventListener('click', () => window.location.href = '/favorite');
+        document.getElementById('sidebar-profile').addEventListener('click', () => window.location.href = '/profile');
+        document.getElementById('sidebar-dashboard').addEventListener('click', () => window.location.href = '/admin');
+        document.getElementById('sidebar-logout').addEventListener('click', () => window.location.href = '/logout');
+        document.getElementById('searchbar').addEventListener('click', () => window.location.href = '/search');
+        document.getElementById('sidebar-filter').addEventListener('click', () => window.location.href = '/filter');
+    </script>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const socket = io();
+            const tbody = document.getElementById("products-body");
+
+            socket.on("product_added", function (product) {
+                if (!tbody) return;
+                if (document.getElementById(`product-${product.id}`)) return;
+                const row = document.createElement("tr");
+                row.id = `product-${product.id}`;
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>₹${product.price}</td>
+                    <td>${product.category}</td>
+                    <td>${product.gender}</td>
+                    <td>${product.stock}</td>
+                    <td>${product.seller_id}</td>
+                    <td><span class="${product.status === 'active' ? 'status-active' : 'status-hide'}">${product.status}</span></td>
+                    <td>
+                        <a href="/product/update/${product.id}" class="action-link">Edit</a>
+                        <form method="POST" action="/product/delete/${product.id}" class="inline-form" onsubmit="return confirm('Delete?');">
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                    </td>`;
+                tbody.prepend(row);
+            });
+
+            socket.on("product_deleted", data => {
+                const row = document.getElementById(`product-${data.id}`);
+                if (row) row.remove();
+            });
+
+            socket.on("product_updated", function (product) {
+                const row = document.getElementById(`product-${product.id}`);
+                if (!row) return;
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>₹${product.price}</td>
+                    <td>${product.category}</td>
+                    <td>${product.gender}</td>
+                    <td>${product.stock}</td>
+                    <td>${product.seller_id}</td>
+                    <td><span class="${product.status === 'active' ? 'status-active' : 'status-hide'}">${product.status}</span></td>
+                    <td>
+                        <a href="/product/update/${product.id}" class="action-link">Edit</a>
+                        <form method="POST" action="/product/delete/${product.id}" class="inline-form" onsubmit="return confirm('Delete?');">
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                    </td>`;
+            });
+
+            socket.on("order_created", function (order) {
+                const ordersTbody = document.getElementById("orders-table-body");
+                if (!ordersTbody) return;
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${order.order_id}</td>
+                    <td>${order.user_id}</td>
+                    <td>${order.product.id}</td>
+                    <td>${order.quantity}</td>
+                    <td>₹${order.purchase_price}</td>`;
+                ordersTbody.prepend(row);
+            });
         });
-
-        const favoritebtn = document.getElementById('sidebar-favorite');
-        favoritebtn.addEventListener('click', () => {
-            window.location.href = '/favorite';
-        });
-
-        const profilebtn = document.getElementById('sidebar-profile');
-        profilebtn.addEventListener('click', () => {
-            window.location.href = '/profile';
-        })
-
-        const logoutbtn = document.getElementById('sidebar-logout');
-        logoutbtn.addEventListener('click', () => {
-            window.location.href = '/logout'
-        })
-
-        const myproductbtn = document.getElementById('sidebar-myproduct');
-        if (myproductbtn) {
-            myproductbtn.addEventListener('click', () => {
-                window.location.href = '/myproduct'
-            })
-        }
-
-        const admindashboardbtn = document.getElementById('sidebar-dashboard');
-        if (admindashboardbtn) {
-            admindashboardbtn.addEventListener('click', () => {
-                window.location.href = '/admin'
-            })
-        }
-
-        const searchbar = document.getElementById('searchbar');
-        searchbar.addEventListener('click', () => {
-            window.location.href = '/search'
-        })
-
-        const filter = document.getElementById('sidebar-filter');
-        filter.addEventListener('click', () => {
-            window.location.href = '/filter'
-        })
     </script>
 
 </body>
-
-<!-- <script>
-    const filterBtn = document.getElementById('sidebar-filter');
-    const filterDropdown = document.getElementById('filter-dropdown');
-
-    filterBtn.addEventListener('click', () => {
-        if (filterDropdown.style.display === 'none' || filterDropdown.style.display === '') {
-            filterDropdown.style.display = 'block';
-        } else {
-            filterDropdown.style.display = 'none';
-        }
-    });
-
-    const priceRange = document.getElementById('priceRange');
-    const priceValue = document.getElementById('priceValue');
-
-    priceRange.addEventListener('input', () => {
-        priceValue.innerText = priceRange.value;
-    });
-</script> -->
-
-
-
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const socket = io();
-
-        const tbody = document.getElementById("products-body");
-        if (!tbody) {
-            console.error("products-body not found")
-            return;
-        }
-
-        socket.on("product_added", function (product) {
-            console.log("Product added:", product);
-
-
-            // avoid duplicate row
-            if (document.getElementById(`product-${product.id}`)) return;
-
-            const row = document.createElement("tr");
-            row.id = `product-${product.id}`;
-
-            row.innerHTML = `
-                <td>${product.id}</td>
-                <td>${product.name}</td>
-                <td>₹${product.price}</td>
-                <td>${product.category}</td>
-                <td>${product.gender}</td>
-                <td>${product.stock}</td>
-                <td>${product.seller_id}</td>
-                <td>${product.status}</td>
-                <td>
-                    <a href="/update/${product.id}">Edit</a>
-                    <form method="POST" action="/delete/${product.id}" style="display:inline;"
-                          onsubmit="return confirm('Delete this product?');">
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>
-            `;
-
-            tbody.prepend(row); // add at top
-        });
-
-
-        socket.on("product_deleted", data => {
-            console.log("Product deleted:", data.id);
-            const row = document.getElementById(`product-${data.id}`);
-            if (row) {
-                row.remove();
-            }
-        });
-        socket.on("product_updated", function (product) {
-            console.log("Product updated:", product);
-            const row = document.getElementById(`product-${product.id}`);
-            if (!row) return;
-
-            row.innerHTML = `
-                <td>${product.id}</td>
-                <td>${product.name}</td>
-                <td>₹${product.price}</td>
-                <td>${product.category}</td>
-                <td>${product.gender}</td>
-                <td>${product.stock}</td>
-                <td>${product.seller_id}</td>
-                <td>${product.status}</td>
-                <td>
-                    <a href="/update/${product.id}">Edit</a>
-                    <form method="POST" action="/delete/${product.id}" style="display:inline;"
-                          onsubmit="return confirm('Delete this product?');">
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>
-            `;
-        });
-
-
-
-        socket.on("order_created", function (order) {
-            console.log("order place :", order)
-            const tbody = document.getElementById("orders-table-body");
-            if (!tbody) return;
-
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${order.order_id}</td>
-                <td>${order.user_id}</td>
-                <td>${order.product.id}</td>
-                <td>${order.quantity}</td>
-                <td>₹${order.purchase_price}</td>
-            `;
-
-            // Add newest order on top
-            tbody.prepend(row);
-        })
-
-    });
-
-</script>
-
 </html>

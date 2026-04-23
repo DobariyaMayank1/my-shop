@@ -1,32 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Product Not Found – My Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh; background: #f7f8fa;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .error-card {
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            padding: 56px 48px; text-align: center;
+            max-width: 440px; width: 100%;
+        }
+
+        .error-icon { font-size: 64px; margin-bottom: 20px; }
+
+        .error-card h2 {
+            font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;
+        }
+
+        .flash-messages p {
+            background: #fff3cd; border: 1px solid #ffc107; color: #856404;
+            padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 14px;
+        }
+
+        .error-card p {
+            font-size: 15px; color: #666; margin-bottom: 28px; line-height: 1.6;
+        }
+
+        .btn-home {
+            display: inline-block; padding: 12px 28px;
+            background: #ff6600; color: #fff; border-radius: 10px;
+            font-size: 15px; font-weight: 600; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-home:hover { background: #e05500; }
+    </style>
 </head>
-
 <body>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
+    <div class="error-card">
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% if error %}
+        <div class="error-icon">📦</div>
+        <h2>Product not found</h2>
+        <p>We don't have this type of product in our store.</p>
         {% endif %}
-    {% endwith %}
 
-    {% if error %}
-    <!-- <h1>{{error}}</h1> -->
-    <h1>we doesn't have this type of product </h1>
-    {% endif %}
-    
-    
-    {% if status %}
-    <h1>this product is block temporary </h1>
-    {%  endif %}
+        {% if status %}
+        <div class="error-icon">🚫</div>
+        <h2>Product unavailable</h2>
+        <p>This product is temporarily blocked and not available for purchase.</p>
+        {% endif %}
 
-    <h1><a href="{{  url_for('home.home')  }}">find other products here</a> </h1>
+        <a href="{{ url_for('home.home') }}" class="btn-home">Browse Other Products</a>
+    </div>
 </body>
-
 </html>

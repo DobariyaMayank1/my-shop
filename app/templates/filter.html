@@ -1,234 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home page</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <title>Filter – My Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f7f8fa; color: #1a1a1a; }
 
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 28px; height: 64px;
+            background: #fff; border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .logo { font-size: 22px; font-weight: 800; color: #ff6600; letter-spacing: -0.5px; }
+        .searchbar { flex: 1; display: flex; justify-content: center; padding: 0 24px; }
+        .searchbar input {
+            width: 100%; max-width: 480px; padding: 9px 16px;
+            border: 1px solid #ddd; border-radius: 24px; font-size: 14px;
+            outline: none; background: #f7f8fa; cursor: pointer;
+        }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .header-right a { text-decoration: none; color: #444; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+        .header-right a:hover { color: #ff6600; }
+
+        .layout { display: flex; height: calc(100vh - 64px); }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 240px; flex-shrink: 0;
+            background: #fff; border-right: 1px solid #e5e7eb;
+            display: flex; flex-direction: column; padding: 16px 12px;
+            overflow-y: auto;
+        }
+        .sidebar .top { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar .nav-item {
+            padding: 10px 14px; border-radius: 8px;
+            font-size: 14px; font-weight: 500; color: #444;
+            cursor: pointer; transition: background 0.15s, color 0.15s;
+        }
+        .sidebar .nav-item:hover { background: #fff4ee; color: #ff6600; }
+
+        /* ── Filter Panel ── */
+        .filter-panel {
+            background: #f7f8fa; border: 1px solid #e5e7eb;
+            border-radius: 10px; padding: 16px; margin-top: 8px;
+        }
+        .filter-panel h4 {
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: #888; margin: 14px 0 8px;
+        }
+        .filter-panel h4:first-child { margin-top: 0; }
+        .filter-panel label {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: #444; cursor: pointer;
+            padding: 4px 0;
+        }
+        .filter-panel input[type="checkbox"] { accent-color: #ff6600; width: 14px; height: 14px; }
+        .filter-panel input[type="range"] {
+            width: 100%; accent-color: #ff6600; margin-top: 6px;
+        }
+        .price-display { font-size: 13px; color: #555; margin-top: 4px; }
+
+        .btn-apply {
+            width: 100%; padding: 10px; margin-top: 14px;
+            background: #ff6600; color: #fff; border: none;
+            border-radius: 8px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-apply:hover { background: #e05500; }
+
+        .btn-reset {
+            display: block; text-align: center; margin-top: 8px;
+            font-size: 13px; color: #888; text-decoration: none;
+        }
+        .btn-reset:hover { color: #ff6600; }
+
+        .sidebar .logout-btn {
+            margin-top: 12px; padding: 10px 14px;
+            background: #ff4d4d; color: #fff; border-radius: 8px;
+            font-size: 14px; font-weight: 600; text-align: center; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sidebar .logout-btn:hover { background: #e03c3c; }
+
+        /* ── Main ── */
+        .main { flex: 1; padding: 28px; overflow-y: auto; }
+        .main h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: #fff; border: 1px solid #e5e7eb;
+            border-radius: 12px; overflow: hidden;
+            display: flex; flex-direction: column;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .product-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-2px); }
+        .product-card img { width: 100%; height: 220px; object-fit: cover; }
+        .product-card .card-body { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .product-card .card-body p { font-size: 13px; color: #555; line-height: 1.4; }
+        .product-card .card-body p strong { color: #1a1a1a; }
+        .like-checkbox { accent-color: #ff6600; width: 16px; height: 16px; cursor: pointer; margin-top: 8px; }
+        .buybutton { padding: 14px; }
+        .buybutton a {
+            display: block; text-align: center; padding: 9px 0;
+            background: #ff6600; color: #fff; border-radius: 8px;
+            font-size: 14px; font-weight: 600; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .buybutton a:hover { background: #e05500; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: #888; font-size: 16px; }
+    </style>
+</head>
 <body>
 
-    <!-- HEADER -->
     <div class="header">
         <div class="logo">My Shop</div>
-
         <div class="searchbar" id="searchbar">
-            <input type="text" placeholder="Search products..." />
+            <input type="text" placeholder="Search products..." readonly>
         </div>
-
-        <div class="right">
-            <div class="favorite"><a href="/favorite">Favorite</a></div>
-            <div class="logout"><a href="/logout">Logout</a></div>
-            <div class="profile"><a href="/profile">Profile</a></div>
+        <div class="header-right">
+            <a href="/favorite">❤ Favorite</a>
+            <a href="/profile">👤 Profile</a>
+            <a href="/logout">Logout</a>
         </div>
     </div>
 
-    <!-- LAYOUT -->
     <div class="layout">
-
-        <!-- SIDEBAR -->
         <div class="sidebar">
-
             <div class="top">
-                <div class="home" id="sidebar-home">Home</div>
-                <!-- <div class="home" ><button onsubmit="return ">Home</button></div> -->
-                <div class="favorite" id="sidebar-favorite">Favorite</div>
-                <div class="profile" id="sidebar-profile">Profile</div>
+                <div class="nav-item" id="sidebar-home">🏠 Home</div>
+                <div class="nav-item" id="sidebar-favorite">❤ Favorite</div>
+                <div class="nav-item" id="sidebar-profile">👤 Profile</div>
                 {% if user.user_type == 's' %}
-                <div class="my_product" id="sidebar-myproduct">My Product</div>
+                <div class="nav-item" id="sidebar-myproduct">📦 My Products</div>
                 {% endif %}
                 {% if user.user_type == 'admin' %}
-                <div class="admin" id="sidebar-dashboard">admin dashboard</div>
+                <div class="nav-item" id="sidebar-dashboard">⚙ Admin Dashboard</div>
                 {% endif %}
-                <div class="filter" id="sidebar-filter">Filter</div>
 
-                <div class="filter-dropdown" id="filter-dropdown">
+                <div class="filter-panel">
                     <h4>Category</h4>
-                    <label><input type="checkbox" value="shirt"> Shirt</label><br>
-                    <label><input type="checkbox" value="pant"> Pant</label><br>
+                    <label><input type="checkbox" value="shirt"> Shirt</label>
+                    <label><input type="checkbox" value="pant"> Pant</label>
                     <label><input type="checkbox" value="shoes"> Shoes</label>
 
                     <h4>Gender</h4>
-                    <label><input type="checkbox" value="men"> Men</label><br>
-                    <label><input type="checkbox" value="women"> Women</label><br>
-                    <label><input type="checkbox" value="kids"> Kid</label>
+                    <label><input type="checkbox" value="men"> Men</label>
+                    <label><input type="checkbox" value="women"> Women</label>
+                    <label><input type="checkbox" value="kids"> Kids</label>
 
-                    <h4>Price</h4>
-                    <input type="range" min="0" max="5000" step="100" id="priceRange">
-                    <p>Max Price: ₹<span id="priceValue">2500</span></p>
+                    <h4>Max Price</h4>
+                    <input type="range" min="0" max="5000" step="100" id="priceRange" value="5000">
+                    <p class="price-display">₹<span id="priceValue">5000</span></p>
 
-                    <button id="apply-filter">Apply Filter</button>
-                    <a href="/filter">reset</a>
-
+                    <button class="btn-apply" id="apply-filter">Apply Filter</button>
+                    <a href="/filter" class="btn-reset">Reset filters</a>
                 </div>
-
             </div>
-            <div class="logout" id="sidebar-logout">Logout</div>
+            <div class="logout-btn" id="sidebar-logout">Logout</div>
         </div>
 
-        <!-- MAIN -->
         <div class="main">
+            <h2>🔍 Filtered Products</h2>
+
             {% if products %}
             <div class="products">
                 {% for product in products %}
                 <div class="product-card">
-
-                    <img src="{{ url_for('static', filename='uploads/' + product.product_image) }}">
-
-                    <p><strong>Name:</strong> {{ product.product_name }}</p>
-                    <p><strong>Price:</strong> ₹{{ product.product_price }}</p>
-                    <p><strong>Details:</strong> {{ product.product_details }}</p>
-                    <p><strong>Category:</strong> {{ product.product_category }}</p>
-                    <p><strong>Gender:</strong> {{ product.product_gender }}</p>
-                    <p><strong>Stock:</strong> {{ product.product_stock }}</p>
-                    <p><strong>Seller ID:</strong> {{ product.seller_id }}</p>
-                    <p><strong>Product ID:</strong> {{ product.id }}</p>
-                    <input type="checkbox" class="like-checkbox" data-product-id="{{ product.id }}" 
-                    {% if product.id in liked_products %}
-                        checked 
-                    {% endif %}>
-
-                    <div class="buybutton">
-                        <a href="{{ url_for('payment.buyButton', product_id=product.id) }}">buy</a>
+                    <img src="{{ url_for('static', filename='uploads/' + product.product_image) }}" alt="{{ product.product_name }}">
+                    <div class="card-body">
+                        <p><strong>{{ product.product_name }}</strong></p>
+                        <p>₹{{ product.product_price }}</p>
+                        <p>{{ product.product_details }}</p>
+                        <p>{{ product.product_category }} · {{ product.product_gender }}</p>
+                        <p>Stock: {{ product.product_stock }}</p>
+                        <p style="font-size:11px;color:#aaa;">ID: {{ product.id }} · Seller: {{ product.seller_id }}</p>
+                        <input type="checkbox" class="like-checkbox" data-product-id="{{ product.id }}"
+                            {% if product.id in liked_products %}checked{% endif %}>
                     </div>
-
+                    <div class="buybutton">
+                        <a href="{{ url_for('payment.buyButton', product_id=product.id) }}">Buy Now</a>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
-            {%  else  %}
-            <div class="notFound">
-                <h1>this products are currently not available</h1>
-            </div>
+            {% else %}
+            <div class="empty-state">No products match your filters. Try adjusting them.</div>
             {% endif %}
-
-
         </div>
     </div>
 
-
     <script>
-        const homebtn = document.getElementById('sidebar-home')
-        homebtn.addEventListener('click', () => {
-            window.location.href = '/home';
-        });
-
-        const favoritebtn = document.getElementById('sidebar-favorite');
-        favoritebtn.addEventListener('click', () => {
-            window.location.href = '/favorite';
-        });
-
-        const profilebtn = document.getElementById('sidebar-profile');
-        profilebtn.addEventListener('click', () => {
-            window.location.href = '/profile';
-        })
-
-        const logoutbtn = document.getElementById('sidebar-logout');
-        logoutbtn.addEventListener('click', () => {
-            window.location.href = '/logout'
-        })
+        document.getElementById('sidebar-home').addEventListener('click', () => window.location.href = '/home');
+        document.getElementById('sidebar-favorite').addEventListener('click', () => window.location.href = '/favorite');
+        document.getElementById('sidebar-profile').addEventListener('click', () => window.location.href = '/profile');
+        document.getElementById('sidebar-logout').addEventListener('click', () => window.location.href = '/logout');
+        document.getElementById('searchbar').addEventListener('click', () => window.location.href = '/search');
 
         const myproductbtn = document.getElementById('sidebar-myproduct');
-        if (myproductbtn) {
-            myproductbtn.addEventListener('click', () => {
-                window.location.href = '/myproduct'
-            })
-        }
+        if (myproductbtn) myproductbtn.addEventListener('click', () => window.location.href = '/myproduct');
 
         const admindashboardbtn = document.getElementById('sidebar-dashboard');
-        if (admindashboardbtn) {
-            admindashboardbtn.addEventListener('click', () => {
-                window.location.href = '/admin'
-            })
-        }
+        if (admindashboardbtn) admindashboardbtn.addEventListener('click', () => window.location.href = '/admin');
 
+        const priceRange = document.getElementById('priceRange');
+        const priceValue = document.getElementById('priceValue');
+        priceRange.addEventListener('input', () => priceValue.textContent = priceRange.value);
 
-        const searchbar = document.getElementById('searchbar');
-        searchbar.addEventListener('click', () => {
-            window.location.href = '/search'
-        })
+        document.getElementById('apply-filter').addEventListener('click', () => {
+            const categories = Array.from(document.querySelectorAll('input[value="shirt"], input[value="pant"], input[value="shoes"]'))
+                .filter(cb => cb.checked).map(cb => cb.value);
+            const genders = Array.from(document.querySelectorAll('input[value="men"], input[value="women"], input[value="kids"]'))
+                .filter(cb => cb.checked).map(cb => cb.value);
+            const maxPrice = priceRange.value;
+            const params = new URLSearchParams({ category: categories.join(','), gender: genders.join(','), price: maxPrice });
+            window.location.href = `/filter?${params.toString()}`;
+        });
 
+        document.addEventListener('change', function (e) {
+            if (!e.target.classList.contains('like-checkbox')) return;
+            fetch('/like', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: parseInt(e.target.dataset.productId), liked: e.target.checked })
+            }).then(res => res.json()).catch(console.error);
+        });
     </script>
 
 </body>
-
-<script>
-    const filterBtn = document.getElementById('sidebar-filter');
-    const filterDropdown = document.getElementById('filter-dropdown');
-
-    filterBtn.addEventListener('click', () => {
-        if (filterDropdown.style.display === 'none' || filterDropdown.style.display === '') {
-            filterDropdown.style.display = 'block';
-        } else {
-            filterDropdown.style.display = 'none';
-        }
-    });
-
-    const priceRange = document.getElementById('priceRange');
-    const priceValue = document.getElementById('priceValue');
-
-    priceRange.addEventListener('input', () => {
-        priceValue.innerText = priceRange.value;
-    });
-</script>
-
-<script>
-    document.getElementById('apply-filter').addEventListener('click', () => {
-
-        const categories = Array.from(
-            document.querySelectorAll('input[value="shirt"], input[value="pant"], input[value="shoes"]')
-        ).filter(cb => cb.checked).map(cb => cb.value);
-
-        const genders = Array.from(
-            document.querySelectorAll('input[value="men"], input[value="women"], input[value="kids"]')
-        ).filter(cb => cb.checked).map(cb => cb.value);
-
-        const maxPrice = document.getElementById('priceRange').value;
-
-        const params = new URLSearchParams({
-            category: categories.join(','),
-            gender: genders.join(','),
-            price: maxPrice
-        });
-
-        window.location.href = `/filter?${params.toString()}`;
-    });
-</script>
-
-
-<script>
-document.addEventListener('change', function (e) {
-    if (e.target.classList.contains('like-checkbox')) {
-        const productId = parseInt(e.target.dataset.productId);
-        const liked = e.target.checked;
-
-        fetch('/like', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                product_id: productId,
-                liked: liked
-            })
-        })
-        .then(res => {
-            if (!res.ok) throw new Error('/like failed');
-            return res.json();
-        })
-        .then(() => fetch('/liked-products'))
-        .then(res => {
-            if (!res.ok) throw new Error('/liked-products not found');
-            return res.json();
-        })
-        .then(data => {
-            console.log('Updated liked:', data);
-        })
-        .catch(err => {
-            console.error('Like error:', err.message);
-        });
-    }
-});
-</script>
-
-
 </html>

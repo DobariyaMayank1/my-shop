@@ -7,7 +7,7 @@ https://github.com/mayank-tagline/e-commerce
 
 ---
 
-## 📌 Project Overview
+## 📌 Project Overview.
 
 This application allows:
 

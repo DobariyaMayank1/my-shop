@@ -1,40 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>buy</title>
+    <title>Buy – My Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh; background: #f7f8fa;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .buy-wrapper { display: flex; gap: 28px; align-items: flex-start; max-width: 800px; width: 100%; }
+
+        .product-card {
+            background: #fff; border: 1px solid #e5e7eb;
+            border-radius: 12px; overflow: hidden;
+            width: 280px; flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+        }
+
+        .product-card img {
+            width: 100%; height: 260px; object-fit: cover;
+        }
+
+        .product-card .card-body { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+
+        .product-card .card-body p { font-size: 14px; color: #555; line-height: 1.4; }
+        .product-card .card-body p strong { color: #1a1a1a; }
+
+        .checkout-panel {
+            flex: 1; background: #fff; border: 1px solid #e5e7eb;
+            border-radius: 12px; padding: 28px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+        }
+
+        .checkout-panel h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+
+        .flash-messages p {
+            background: #fff3cd; border: 1px solid #ffc107; color: #856404;
+            padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 14px;
+        }
+
+        .price-display {
+            font-size: 32px; font-weight: 800; color: #ff6600; margin-bottom: 24px;
+        }
+
+        .btn-buy {
+            display: block; width: 100%; padding: 14px;
+            background: #ff6600; color: #fff; border-radius: 10px;
+            font-size: 16px; font-weight: 700; text-align: center;
+            text-decoration: none; transition: background 0.2s;
+        }
+        .btn-buy:hover { background: #e05500; }
+
+        .back-link {
+            display: block; text-align: center; margin-top: 14px;
+            font-size: 14px; color: #888; text-decoration: none;
+        }
+        .back-link:hover { color: #ff6600; }
+    </style>
 </head>
-
 <body>
-    <!-- {{ product_id  }} -->
+    <div class="buy-wrapper">
+        <div class="product-card">
+            <img src="{{ url_for('static', filename='uploads/' + product.product_image) }}" alt="{{ product.product_name }}">
+            <div class="card-body">
+                <p><strong>{{ product.product_name }}</strong></p>
+                <p>{{ product.product_details }}</p>
+                <p>{{ product.product_category }} · {{ product.product_gender }}</p>
+                <p>Stock: {{ product.product_stock }}</p>
+                <p style="font-size:11px;color:#aaa;">Seller ID: {{ product.seller_id }}</p>
+            </div>
+        </div>
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    {% for message in messages %}
-    <p>{{ message }}</p>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+        <div class="checkout-panel">
+            <h2>Checkout</h2>
 
-    <div style="border: 1px solid #ccc; padding: 15px; width: 260px; margin: 15px;">
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
 
-        <img src="{{ url_for('static', filename='uploads/' + product.product_image) }}"
-            style="width: 100%; height: auto; margin-bottom: 10px;">
+            <div class="price-display">₹{{ product.product_price }}</div>
 
-        <p><strong>Name:</strong> {{ product.product_name }}</p>
-        <p><strong>Price:</strong> ₹{{ product.product_price }}</p>
-        <p><strong>Details:</strong> {{ product.product_details }}</p>
-        <p><strong>Category:</strong> {{ product.product_category }}</p>
-        <p><strong>Gender:</strong> {{ product.product_gender }}</p>
-        <p><strong>Stock:</strong> {{ product.product_stock }}</p>
-        <p><strong>Seller ID:</strong> {{ product.seller_id }}</p>
-
+            <a href="{{ url_for('payment.payment') }}" class="btn-buy">Buy Now</a>
+            <a href="/home" class="back-link">← Continue shopping</a>
+        </div>
     </div>
-
-    <h1><a href="{{ url_for('payment.payment') }}">BUY NOW</a></h1>
-
 </body>
-
 </html>

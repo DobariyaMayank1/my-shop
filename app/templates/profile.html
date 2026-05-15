@@ -1,337 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home page</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <title>Profile – My Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f7f8fa; color: #1a1a1a; }
 
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 28px; height: 64px;
+            background: #fff; border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .logo { font-size: 22px; font-weight: 800; color: #ff6600; letter-spacing: -0.5px; }
+        .searchbar { flex: 1; display: flex; justify-content: center; padding: 0 24px; }
+        .searchbar input {
+            width: 100%; max-width: 480px; padding: 9px 16px;
+            border: 1px solid #ddd; border-radius: 24px; font-size: 14px;
+            outline: none; background: #f7f8fa; cursor: pointer;
+        }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .header-right a { text-decoration: none; color: #444; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+        .header-right a:hover { color: #ff6600; }
+
+        .layout { display: flex; height: calc(100vh - 64px); }
+
+        .sidebar {
+            width: 220px; flex-shrink: 0;
+            background: #fff; border-right: 1px solid #e5e7eb;
+            display: flex; flex-direction: column; padding: 16px 12px;
+        }
+        .sidebar .top { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar .nav-item {
+            padding: 10px 14px; border-radius: 8px;
+            font-size: 14px; font-weight: 500; color: #444;
+            cursor: pointer; transition: background 0.15s, color 0.15s;
+        }
+        .sidebar .nav-item:hover { background: #fff4ee; color: #ff6600; }
+        .sidebar .nav-item.active { background: #fff4ee; color: #ff6600; }
+        .sidebar .logout-btn {
+            margin-top: 12px; padding: 10px 14px;
+            background: #ff4d4d; color: #fff; border-radius: 8px;
+            font-size: 14px; font-weight: 600; text-align: center; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sidebar .logout-btn:hover { background: #e03c3c; }
+
+        .main { flex: 1; padding: 28px; overflow-y: auto; }
+
+        /* ── Profile Card ── */
+        .profile-card {
+            background: #fff; border: 1px solid #e5e7eb;
+            border-radius: 12px; padding: 24px; margin-bottom: 28px;
+            display: flex; align-items: flex-start; gap: 24px;
+        }
+        .profile-avatar {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: linear-gradient(135deg, #ff6600, #ff9944);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: #fff; flex-shrink: 0;
+        }
+        .profile-info { flex: 1; }
+        .profile-info h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .profile-info .meta { font-size: 13px; color: #666; margin-bottom: 12px; }
+        .profile-info .meta span { margin-right: 16px; }
+        .profile-info .info-row { font-size: 13px; color: #555; margin-bottom: 4px; }
+        .profile-info .info-row strong { color: #1a1a1a; }
+        .profile-actions { display: flex; gap: 10px; margin-top: 16px; }
+        .btn-outline {
+            padding: 8px 16px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 13px; font-weight: 500; color: #444;
+            text-decoration: none; transition: border-color 0.2s, color 0.2s;
+        }
+        .btn-outline:hover { border-color: #ff6600; color: #ff6600; }
+
+        /* ── Orders Table ── */
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+
+        .table-wrapper { overflow-x: auto; }
+
+        table {
+            width: 100%; border-collapse: collapse;
+            background: #fff; border-radius: 12px; overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        thead tr { background: #f9fafb; }
+        th {
+            padding: 12px 14px; text-align: left;
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.4px; color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        td {
+            padding: 12px 14px; font-size: 13px; color: #374151;
+            border-bottom: 1px solid #f3f4f6; vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+
+        td img { border-radius: 6px; object-fit: cover; }
+
+        .text-danger { color: #dc2626; }
+        .text-muted { color: #9ca3af; }
+
+        .btn-buy-again {
+            padding: 5px 12px; background: #ff6600; color: #fff;
+            border-radius: 6px; font-size: 12px; font-weight: 600;
+            text-decoration: none; transition: background 0.2s;
+        }
+        .btn-buy-again:hover { background: #e05500; }
+    </style>
+</head>
 <body>
 
-    <!-- HEADER -->
     <div class="header">
         <div class="logo">My Shop</div>
-
         <div class="searchbar" id="searchbar">
-            <input type="text" placeholder="Search products..." />
+            <input type="text" placeholder="Search products..." readonly>
         </div>
-
-        <div class="right">
-            <div class="favorite"><a href="/favorite">Favorite</a></div>
-            <div class="logout"><a href="/logout">Logout</a></div>
-            <div class="profile"><a href="/profile">Profile</a></div>
+        <div class="header-right">
+            <a href="/favorite">❤ Favorite</a>
+            <a href="/profile">👤 Profile</a>
+            <a href="/logout">Logout</a>
         </div>
     </div>
 
-    <!-- LAYOUT -->
     <div class="layout">
-
-        <!-- SIDEBAR -->
         <div class="sidebar">
-
             <div class="top">
-                <div class="home" id="sidebar-home">Home</div>
-                <!-- <div class="home" ><button onsubmit="return ">Home</button></div> -->
-                <div class="favorite" id="sidebar-favorite">Favorite</div>
-                <div class="profile" id="sidebar-profile">Profile</div>
+                <div class="nav-item" id="sidebar-home">🏠 Home</div>
+                <div class="nav-item" id="sidebar-favorite">❤ Favorite</div>
+                <div class="nav-item active" id="sidebar-profile">👤 Profile</div>
                 {% if user.user_type == 's' %}
-                <div class="my_product" id="sidebar-myproduct">My Product</div>
+                <div class="nav-item" id="sidebar-myproduct">📦 My Products</div>
                 {% endif %}
                 {% if user.user_type == 'admin' %}
-                <div class="admin" id="sidebar-dashboard">admin dashboard</div>
+                <div class="nav-item" id="sidebar-dashboard">⚙ Admin Dashboard</div>
                 {% endif %}
-                <div class="filter" id="sidebar-filter">Filter</div>
+                <div class="nav-item" id="sidebar-filter">🔍 Filter</div>
             </div>
-            <div class="logout" id="sidebar-logout">Logout</div>
+            <div class="logout-btn" id="sidebar-logout">Logout</div>
         </div>
 
-        <!-- MAIN -->
         <div class="main">
 
             {% if user %}
-            <p>user id is : {{ user.id }}</p>
-            <p>user name is : {{ user.username }}</p>
-            <p>user type is : {{ user.user_type }}</p>
-            <p>user email is : {{ user.email }}</p>
-            <p>user password is : {{ user.password }}</p>
+            <div class="profile-card">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-info">
+                    <h2>{{ user.username }}</h2>
+                    <div class="meta">
+                        <span>{{ 'Seller' if user.user_type == 's' else ('Admin' if user.user_type == 'admin' else 'Buyer') }}</span>
+                        <span>ID: {{ user.id }}</span>
+                    </div>
+                    <div class="info-row"><strong>Email:</strong> {{ user.email }}</div>
+                    <div class="profile-actions">
+                        <a href="/updateuser" class="btn-outline">Edit Profile</a>
+                        <a href="/resetpassword" class="btn-outline">Change Password</a>
+                    </div>
+                </div>
+            </div>
             {% endif %}
 
-            <div>
-                <a href="/updateuser">update your details</a>
-            </div>
-            <div>
-                <a href="/resetpassword">Reset password</a>
-            </div>
+            <div class="section-title">🛍 My Orders</div>
 
-
-            <br><br><br>
-            <h2>My Orders</h2>
-
-            <table border="1" cellpadding="8">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Product Name</th>
-                        <th>Purchase Price</th>
-                        <th>Current Price</th>
-                        <th>Seller_id</th>
-                        <th>Category</th>
-                        <th>Gender</th>
-                        <th>Stock</th>
-                        <th>Quantity Bought</th>
-                        <th>Image</th>
-                        <th>Buy Again</th>
-                    </tr>
-                </thead>
-
-                <tbody id="orders-table-body">
-                    {% for order in orders %}
-                    <tr data-product-id="{{ order.product_id }}">
-                        <td>{{ order.id }}</td>
-
-                        <!-- <td>
-                            {% if order.product %}
-                                {{ order.product.product_name }}
-                            {% else %}
-                            <span style="color:red;">Product deleted</span>
-                            {% endif %}
-                        </td> -->
-                        <td class="product-name">{{ order.product_name }}</td>
-                        
-                        
-                        <td>₹ {{ order.purchase_price }}</td>
-                        
-                        <td class="current-price">
-                            {% if order.product %}
-                                {{ order.product.product_price }}
-                            {% else %}
-                            <span style="color:red;">Product deleted</span>
-                            {% endif %}
-                        </td>
-                        <!-- <td>₹ {{ order.product.product_price }}</td> -->
-                        
-                        <!-- <td>
-                            {% if order.product %}
-                                {{ order.product.seller_id }}
-                            {% else %}
-                            <span style="color:red;">Product deleted</span>
-                            {% endif %}
-                        </td> -->
-                        <td>{{ order.seller_id }}</td>
-                        
-                        <!-- <td>
-                            {% if order.product %}
-                                {{ order.product.product_category }}
-                            {% else %}
-                            <span style="color:red;">Product deleted</span>
-                            {% endif %}
-                        </td> -->
-                        <td>{{ order.product_category }}</td>
-                        
-                        <!-- <td>
-                            {% if order.product %}
-                            {{ order.product.product_gender }}
-                            {% else %}
-                            <span style="color:red;">Product deleted</span>
-                            {% endif %}
-                        </td> -->
-                        <td>{{ order.product_gender }}</td>
-                        
-                        <td class="stock">
-                            {% if order.product %}
-                                {% if order.product.product_stock > 0 %}
-                                    {{ order.product.product_stock }}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Product</th>
+                            <th>Paid</th>
+                            <th>Current Price</th>
+                            <th>Category</th>
+                            <th>Gender</th>
+                            <th>Stock</th>
+                            <th>Qty</th>
+                            <th>Image</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                        {% for order in orders %}
+                        <tr data-product-id="{{ order.product_id }}">
+                            <td>{{ order.id }}</td>
+                            <td class="product-name">{{ order.product_name }}</td>
+                            <td>₹{{ order.purchase_price }}</td>
+                            <td class="current-price">
+                                {% if order.product %}
+                                    ₹{{ order.product.product_price }}
                                 {% else %}
-                                    <span style="color:red;">Out of stock</span>
+                                    <span class="text-danger">Deleted</span>
                                 {% endif %}
-                            {% else %}
-                                <span style="color:red;">Product deleted</span>
-                            {% endif %}
-                        </td>
-
-                        <td>{{ order.quantity }}</td>
-
-                        <td class="image">
-                            {% if order.product %}
-                            <img src="{{ url_for('static', filename='uploads/' ~ order.product.product_image) }}"
-                                width="60" height="60">
-                            {% else %}
-                            N/A
-                            {% endif %}
-                        </td>
-
-
-                        <td class="buy-again">
-                            {% if order.product
-                            and order.product.status == 'active'
-                            and order.product.product_stock > 0 %}
-                            <a href="{{ url_for('payment.buyButton', product_id=order.product.id) }}">
-                                Buy Again
-                            </a>
-                            {% else %}
-                            <span style="color:gray;">Unavailable</span>
-                            {% endif %}
-                        </td>
-
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5">No purchases yet</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-
+                            </td>
+                            <td>{{ order.product_category }}</td>
+                            <td>{{ order.product_gender }}</td>
+                            <td class="stock">
+                                {% if order.product %}
+                                    {% if order.product.product_stock > 0 %}
+                                        {{ order.product.product_stock }}
+                                    {% else %}
+                                        <span class="text-danger">Out of stock</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-danger">Deleted</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ order.quantity }}</td>
+                            <td class="image">
+                                {% if order.product %}
+                                <img src="{{ url_for('static', filename='uploads/' ~ order.product.product_image) }}"
+                                    width="52" height="52" alt="product">
+                                {% else %}
+                                <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td class="buy-again">
+                                {% if order.product and order.product.status == 'active' and order.product.product_stock > 0 %}
+                                <a href="{{ url_for('payment.buyButton', product_id=order.product.id) }}" class="btn-buy-again">Buy Again</a>
+                                {% else %}
+                                <span class="text-muted">Unavailable</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" style="text-align:center;color:#888;padding:32px;">No orders yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-
     <script>
-        const homebtn = document.getElementById('sidebar-home')
-        homebtn.addEventListener('click', () => {
-            window.location.href = '/home';
-        });
-
-        const favoritebtn = document.getElementById('sidebar-favorite');
-        favoritebtn.addEventListener('click', () => {
-            window.location.href = '/favorite';
-        });
-
-        const profilebtn = document.getElementById('sidebar-profile');
-        profilebtn.addEventListener('click', () => {
-            window.location.href = '/profile';
-        })
-
-        const logoutbtn = document.getElementById('sidebar-logout');
-        logoutbtn.addEventListener('click', () => {
-            window.location.href = '/logout'
-        })
-
+        document.getElementById('sidebar-home').addEventListener('click', () => window.location.href = '/home');
+        document.getElementById('sidebar-favorite').addEventListener('click', () => window.location.href = '/favorite');
+        document.getElementById('sidebar-profile').addEventListener('click', () => window.location.href = '/profile');
+        document.getElementById('sidebar-logout').addEventListener('click', () => window.location.href = '/logout');
+        document.getElementById('searchbar').addEventListener('click', () => window.location.href = '/search');
+        document.getElementById('sidebar-filter').addEventListener('click', () => window.location.href = '/filter');
 
         const myproductbtn = document.getElementById('sidebar-myproduct');
-        if (myproductbtn) {
-            myproductbtn.addEventListener('click', () => {
-                window.location.href = '/myproduct'
-            })
-        }
+        if (myproductbtn) myproductbtn.addEventListener('click', () => window.location.href = '/myproduct');
 
         const admindashboardbtn = document.getElementById('sidebar-dashboard');
-        if (admindashboardbtn) {
-            admindashboardbtn.addEventListener('click', () => {
-                window.location.href = '/admin'
-            })
-        }
+        if (admindashboardbtn) admindashboardbtn.addEventListener('click', () => window.location.href = '/admin');
+    </script>
 
-        const searchbar = document.getElementById('searchbar');
-        searchbar.addEventListener('click', () => {
-            window.location.href = '/search'
-        })
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const socket = io();
 
-        const filter = document.getElementById('sidebar-filter');
-        filter.addEventListener('click', () => {
-            window.location.href = '/filter'
-        })
+            socket.on("order_created", function (order) {
+                const tbody = document.getElementById("orders-table-body");
+                if (!tbody) return;
+                const product = order.product;
+                const stockHtml = product.stock > 0 ? product.stock : `<span class="text-danger">Out of stock</span>`;
+                const buyAgainHtml = product.stock > 0
+                    ? `<a href="/buy/${product.id}" class="btn-buy-again">Buy Again</a>`
+                    : `<span class="text-muted">Unavailable</span>`;
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${order.order_id}</td>
+                    <td>${product.name}</td>
+                    <td>₹${order.purchase_price}</td>
+                    <td>₹${product.current_price}</td>
+                    <td>${product.category}</td>
+                    <td>${product.gender}</td>
+                    <td>${stockHtml}</td>
+                    <td>${order.quantity}</td>
+                    <td><img src="/static/uploads/${product.image}" width="52" height="52" style="border-radius:6px;object-fit:cover;"></td>
+                    <td>${buyAgainHtml}</td>`;
+                tbody.prepend(row);
+            });
 
+            socket.on("product_deleted", function (data) {
+                document.querySelectorAll(`tr[data-product-id="${data.id}"]`).forEach(row => {
+                    const nameCell = row.querySelector(".product-name");
+                    if (nameCell) nameCell.innerHTML = `<span class="text-danger">Product deleted</span>`;
+                    const priceCell = row.querySelector(".current-price");
+                    if (priceCell) priceCell.innerHTML = `<span class="text-danger">N/A</span>`;
+                    const stockCell = row.querySelector(".stock");
+                    if (stockCell) stockCell.innerHTML = `<span class="text-danger">N/A</span>`;
+                    const imageCell = row.querySelector(".image");
+                    if (imageCell) imageCell.innerHTML = `<span class="text-muted">N/A</span>`;
+                    const buyAgainCell = row.querySelector(".buy-again");
+                    if (buyAgainCell) buyAgainCell.innerHTML = `<span class="text-muted">Unavailable</span>`;
+                });
+            });
+        });
     </script>
 
 </body>
-
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const socket = io();
-
-
-        socket.on("order_created", function (order) {
-            console.log("order place :", order);
-
-            const tbody = document.getElementById("orders-table-body");
-            if (!tbody) {
-                console.error("orders-table-body not found");
-                return;
-            }
-
-            const product = order.product;
-
-            // Stock display
-            let stockHtml = product.stock > 0
-                ? product.stock
-                : `<span style="color:red;">Out of stock</span>`;
-
-            // Buy again logic
-            let buyAgainHtml =
-                product.stock > 0
-                    ? `<a href="/buy/${product.id}">Buy Again</a>`
-                    : `<span style="color:gray;">Unavailable</span>`;
-
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${order.order_id}</td>
-                <td>${product.name}</td>
-                <td>₹ ${order.purchase_price}</td>
-                <td>₹ ${product.current_price}</td>
-                <td>${product.seller_id}</td>
-                <td>${product.category}</td>
-                <td>${product.gender}</td>
-                <td>${stockHtml}</td>
-                <td>${order.quantity}</td>
-                <td>
-                    <img src="/static/uploads/${product.image}" width="60" height="60">
-                </td>
-                <td>${buyAgainHtml}</td>
-            `;
-            // Add new order on top
-            tbody.prepend(row);
-        })
-
-        socket.on("product_deleted", function (data) {
-            console.log("Product deleted:", data.id);
-
-            // Find all orders related to this product
-            const rows = document.querySelectorAll(
-                `tr[data-product-id="${data.id}"]`
-            );
-
-            rows.forEach(row => {
-                // Product name
-                const nameCell = row.querySelector(".product-name");
-                if (nameCell) {
-                    nameCell.innerHTML = `<span style="color:red;">Product deleted</span>`;
-                }
-
-                // Current price
-                const priceCell = row.querySelector(".current-price");
-                if (priceCell) {
-                    priceCell.innerHTML = `<span style="color:red;">N/A</span>`;
-                }
-
-                // Stock
-                const stockCell = row.querySelector(".stock");
-                if (stockCell) {
-                    stockCell.innerHTML = `<span style="color:red;">N/A</span>`;
-                }
-
-                // Image
-                const imageCell = row.querySelector(".image");
-                if (imageCell) {
-                    imageCell.innerHTML = `N/A`;
-                }
-
-                // Buy again
-                const buyAgainCell = row.querySelector(".buy-again");
-                if (buyAgainCell) {
-                    buyAgainCell.innerHTML = `<span style="color:gray;">Unavailable</span>`;
-                }
-            });
-        });
-
-    });
-</script>
-
 </html>

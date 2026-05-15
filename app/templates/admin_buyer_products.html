@@ -1,48 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Buyer Orders – Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f7f8fa; color: #1a1a1a; min-height: 100vh; }
+
+        .page-header {
+            background: #fff; border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px; display: flex; align-items: center; gap: 16px;
+        }
+        .page-header h2 { font-size: 20px; font-weight: 700; }
+        .back-link {
+            color: #ff6600; text-decoration: none; font-size: 14px; font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .content { padding: 28px 32px; }
+
+        .table-wrapper { overflow-x: auto; }
+
+        table {
+            width: 100%; border-collapse: collapse;
+            background: #fff; border-radius: 12px; overflow: hidden;
+            border: 1px solid #e5e7eb; font-size: 13px;
+        }
+        thead tr { background: #1f2937; }
+        th {
+            padding: 12px 14px; text-align: left;
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.4px; color: #fff;
+        }
+        td {
+            padding: 11px 14px; color: #374151;
+            border-bottom: 1px solid #f3f4f6; vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+
+        td img { border-radius: 6px; object-fit: cover; }
+    </style>
 </head>
-
 <body>
-    <h2>Buyer Products</h2>
-    <a href="{{ url_for('admin.dashboard') }}">← Back to Dashboard</a>
 
+    <div class="page-header">
+        <a href="{{ url_for('admin.dashboard') }}" class="back-link">← Back to Dashboard</a>
+        <h2>Buyer Orders</h2>
+    </div>
 
-    <table border="1" cellpadding="10">
-        <tr>
-            <th>Order ID</th>
-            <th>Product Name</th>
-            <th>Purchase Price</th>
-            <th>Price</th>
-            <th>Category</th>
-            <th>Gender</th>
-            <th>Stock</th>
-            <th>Quantity Bought</th>
-            <th>Image</th>
-        </tr>
-
-        {% for order in orders %}
-        <tr>
-            <td>{{ order.id }}</td>
-            <td>{{ order.product.product_name }}</td>
-            <td>{{ order.purchase_price }}</td>
-            <td>{{ order.product.product_price }}</td>
-            <td>{{ order.product.product_category }}</td>
-            <td>{{ order.product.product_gender }}</td>
-            <td>{{ order.product.product_stock }}</td>
-            <td>{{ order.quantity }}</td>
-            <td>
-                <img src="{{ url_for('static', filename='uploads/' + order.product.product_image) }}" width="80">
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-
+    <div class="content">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Product Name</th>
+                        <th>Purchase Price</th>
+                        <th>Current Price</th>
+                        <th>Category</th>
+                        <th>Gender</th>
+                        <th>Stock</th>
+                        <th>Qty Bought</th>
+                        <th>Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.product.product_name if order.product else order.product_name }}</td>
+                        <td>₹{{ order.purchase_price }}</td>
+                        <td>
+                            {% if order.product %}
+                                ₹{{ order.product.product_price }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>{{ order.product.product_category if order.product else order.product_category }}</td>
+                        <td>{{ order.product.product_gender if order.product else order.product_gender }}</td>
+                        <td>{{ order.product.product_stock if order.product else 'N/A' }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>
+                            {% if order.product and order.product.product_image %}
+                                <img src="{{ url_for('static', filename='uploads/' + order.product.product_image) }}"
+                                    width="60" height="60" alt="product">
+                            {% elif order.product_image %}
+                                <img src="{{ url_for('static', filename='uploads/' + order.product_image) }}"
+                                    width="60" height="60" alt="product">
+                            {% else %}
+                                <span>No image</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 </body>
-
 </html>

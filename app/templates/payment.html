@@ -3,22 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>payment</title>
+    <title>Payment – My Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh; background: #f7f8fa;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .payment-card {
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            padding: 48px 40px; text-align: center;
+            max-width: 420px; width: 100%;
+        }
+
+        .payment-icon { font-size: 56px; margin-bottom: 16px; }
+
+        .payment-card h1 {
+            font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;
+        }
+
+        .payment-card .subtitle { font-size: 14px; color: #888; margin-bottom: 32px; }
+
+        .bill-amount {
+            background: #fff4ee; border: 1px solid #ffd4b3;
+            border-radius: 12px; padding: 20px;
+            margin-bottom: 28px;
+        }
+
+        .bill-amount .label { font-size: 13px; color: #888; margin-bottom: 4px; }
+
+        .bill-amount .amount {
+            font-size: 40px; font-weight: 800; color: #ff6600;
+        }
+
+        .btn-pay {
+            display: block; width: 100%; padding: 14px;
+            background: #ff6600; color: #fff; border-radius: 10px;
+            font-size: 16px; font-weight: 700; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-pay:hover { background: #e05500; }
+
+        .back-link {
+            display: block; margin-top: 14px;
+            font-size: 14px; color: #888; text-decoration: none;
+        }
+        .back-link:hover { color: #ff6600; }
+    </style>
 </head>
 <body>
-    <h1>
+    <div class="payment-card">
+        <div class="payment-icon">💳</div>
+        <h1>Complete your payment</h1>
+        <p class="subtitle">Review your order total and confirm.</p>
 
-        you can do your payment here!
+        <div class="bill-amount">
+            <div class="label">Total Amount</div>
+            <div class="amount">₹{{ product_price }}</div>
+        </div>
 
-    </h1>
-    <h1>
-        your bill is ₹{{ product_price  }}.
-    </h1>
-    <h1>
-        <a href="/success"> payment now</a>
-
-
-    </h1>
-   
+        <a href="/success" class="btn-pay">Pay Now</a>
+        <a href="/home" class="back-link">← Cancel and go back</a>
+    </div>
 </body>
 </html>

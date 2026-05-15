@@ -3,12 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>success</title>
+    <title>Order Confirmed – My Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh; background: #f7f8fa;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .success-card {
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            padding: 56px 48px; text-align: center;
+            max-width: 420px; width: 100%;
+        }
+
+        .success-icon { font-size: 72px; margin-bottom: 20px; }
+
+        .success-card h1 {
+            font-size: 26px; font-weight: 800; color: #065f46; margin-bottom: 10px;
+        }
+
+        .success-card p {
+            font-size: 15px; color: #666; margin-bottom: 32px; line-height: 1.6;
+        }
+
+        .btn-home {
+            display: inline-block; padding: 12px 28px;
+            background: #ff6600; color: #fff; border-radius: 10px;
+            font-size: 15px; font-weight: 600; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-home:hover { background: #e05500; }
+
+        .btn-profile {
+            display: inline-block; padding: 12px 28px; margin-left: 10px;
+            background: #f3f4f6; color: #374151; border-radius: 10px;
+            font-size: 15px; font-weight: 600; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-profile:hover { background: #e5e7eb; }
+    </style>
 </head>
 <body>
-    <h1>payment done!</h1>
-     <h1>
-        buy more products <a href="/home">find more product</a>
-    </h1>
+    <div class="success-card">
+        <div class="success-icon">✅</div>
+        <h1>Payment successful!</h1>
+        <p>Your order has been placed. You can view it in your profile under "My Orders".</p>
+        <a href="/home" class="btn-home">Shop More</a>
+        <a href="/profile" class="btn-profile">My Orders</a>
+    </div>
 </body>
 </html>

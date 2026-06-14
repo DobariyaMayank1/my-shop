@@ -1,4 +1,5 @@
-🛒 E-Commerce Website (Flask)
+🛒 My-shop Website (Flask)
+
 A full-stack E-Commerce web application built using **Flask, SQLAlchemy, Jinja2, and JavaScript**.  
 This project focuses on **backend architecture, database relationships, role-based access, and admin controls**.
 
@@ -124,7 +125,7 @@ The primary goal of this project is to demonstrate **clean Flask architecture**,
 
 
 ```text
-e-commerce/
+my-shop/
 │
 ├── app/
 │ ├── admin/
@@ -183,7 +184,7 @@ e-commerce/
 git clone https://github.com/DobariyaMayank1/my-shop.git
 ```
 ```bash
-cd e-commerce
+cd my-shop
 
 ```
 

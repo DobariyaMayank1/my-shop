@@ -3,7 +3,7 @@ A full-stack E-Commerce web application built using **Flask, SQLAlchemy, Jinja2,
 This project focuses on **backend architecture, database relationships, role-based access, and admin controls**.
 
 🔗 GitHub Repository:  
-https://github.com/mayank-tagline/e-commerce
+https://github.com/DobariyaMayank1/my-shop
 
 ---
 
@@ -180,7 +180,7 @@ e-commerce/
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/mayank-tagline/e-commerce.git
+git clone https://github.com/DobariyaMayank1/my-shop.git
 ```
 ```bash
 cd e-commerce
@@ -333,6 +333,6 @@ The application handles:
 ## 👨‍💻 Author
 
 **Mayank Dobariya**
-GitHub 👉 [https://github.com/mayank-tagline](https://github.com/mayank-tagline)
+GitHub 👉 [https://github.com/DobariyaMayank1/my-shop](https://github.com/DobariyaMayank1/my-shop)
 
 ⭐ *If you like this project, please give it a star!*
